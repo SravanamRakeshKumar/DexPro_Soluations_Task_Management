@@ -17,6 +17,8 @@ const Dashboard = () => {
   const coordinatorTaskChartRef = useRef(null);
 const logReviewChartRef = useRef(null);
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
   const role = user?.role?.toLowerCase();
 
@@ -25,7 +27,7 @@ const logReviewChartRef = useRef(null);
 
     const fetchDashboardData = async () => {
       try {
-        const res = await axios.get('/api/dashboard/stats', {
+        const res = await axios.get(`${backendUrl}/api/dashboard/stats`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
