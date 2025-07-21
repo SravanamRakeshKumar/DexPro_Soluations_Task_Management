@@ -28,9 +28,11 @@ const UsersPage = () => {
 const [selectedRole, setSelectedRole] = useState('');
 const [selectedStatus, setSelectedStatus] = useState('');
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
   const fetchUsers = async () => {
-    const res = await axios.get('/api/users');
+    const res = await axios.get(`${backendUrl}/api/users`);
     setUsers(res.data);
   };
 
@@ -42,7 +44,7 @@ const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
   const fetchFilteredUsers = async () => {
-    let res = await axios.get('/api/users');
+    let res = await axios.get(`${backendUrl}/api/users`);
     let filtered = res.data;
 
     if (searchQuery) {
@@ -71,14 +73,14 @@ const [selectedStatus, setSelectedStatus] = useState('');
 
 
   const handleAddUser = async () => {
-    const res = await axios.post('/api/users', newUser);
+    const res = await axios.post(`${backendUrl}/api/users`, newUser);
     setUsers([...users, res.data]);
     setIsAdding(false);
     resetForm();
   };
 
   const handleEditUser = async () => {
-    const res = await axios.put(`/api/users/${editingUser._id}`, editingUser);
+    const res = await axios.put(`${backendUrl}/api/users/${editingUser._id}`, editingUser);
     setUsers(users.map(user => user._id === editingUser._id ? res.data : user));
     setIsEditing(false);
     setEditingUser(null);
@@ -86,7 +88,7 @@ const [selectedStatus, setSelectedStatus] = useState('');
 
   const handleDeleteUser = async (id) => {
     if (window.confirm('Delete this user?')) {
-      await axios.delete(`/api/users/${id}`);
+      await axios.delete(`${backendUrl}/api/users/${id}`);
       setUsers(users.filter(user => user._id !== id));
     }
   };
