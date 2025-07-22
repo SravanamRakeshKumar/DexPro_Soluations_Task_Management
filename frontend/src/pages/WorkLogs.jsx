@@ -4,7 +4,9 @@ import { projectService } from '../services/projectService';
 import { taskService } from '../services/taskService';
 import { worklogService } from '../services/worklogService';
 import userService from '../services/userService';
-import { toast } from 'react-hot-toast';
+// import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
+
 
 const WorkLogs = () => {
   const { user } = useAuth();
@@ -279,30 +281,34 @@ const WorkLogs = () => {
       )} 
 
       {/* 📊 WorkLog Table */}
+
       <div className="overflow-x-auto mt-6">
-        <table className="table-auto w-full text-sm border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th>Employee</th>
-              <th>Project</th>
-              <th>Task</th>
-              <th>Date</th>
-              <th>Time Spent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLogs.map(log => (
-              <tr key={log._id}>
-                <td>{allUsers.find(u => u._id === log.userId)?.name || 'Unknown'}</td>
-                <td>{projects.find(p => p._id === log.projectId)?.name || 'Unknown'}</td>
-                <td>{allTasks.find(t => t._id === log.taskId)?.title || 'Unknown'}</td>
-                <td>{new Date(log.date).toLocaleDateString()}</td>
-                <td>{formatTime((log.todayTimeSpent || []).reduce((a, b) => a + b, 0))}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+  <table className="table-auto w-full text-sm border">
+    <thead>
+      <tr className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white">
+        <th className="px-4 py-2">Employee</th>
+        <th className="px-4 py-2">Project</th>
+        <th className="px-4 py-2">Task</th>
+        <th className="px-4 py-2">Date</th>
+        <th className="px-4 py-2">Time Spent</th>
+      </tr>
+    </thead>
+    <tbody className="text-gray-700 dark:text-gray-300">
+      {filteredLogs.map(log => (
+        <tr key={log._id} className="border-t">
+          <td className="px-4 py-2">{allUsers.find(u => u._id === log.userId)?.name || 'Unknown'}</td>
+          <td className="px-4 py-2">{projects.find(p => p._id === log.projectId)?.name || 'Unknown'}</td>
+          <td className="px-4 py-2">{allTasks.find(t => t._id === log.taskId)?.title || 'Unknown'}</td>
+          <td className="px-4 py-2">{new Date(log.date).toLocaleDateString()}</td>
+          <td className="px-4 py-2">
+            {formatTime((log.todayTimeSpent || []).reduce((a, b) => a + b, 0))}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
     </div>
   );
 };

@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import { Copy, Plus, Edit, Trash2, X } from 'lucide-react';
 import clsx from 'clsx';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 const roleColors = {
   Admin: 'bg-red-100 text-red-800',
@@ -74,6 +76,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleAddUser = async () => {
     const res = await axios.post(`${backendUrl}/api/users`, newUser);
+    toast.success('Add User Successfully')
     setUsers([...users, res.data]);
     setIsAdding(false);
     resetForm();
@@ -81,6 +84,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const handleEditUser = async () => {
     const res = await axios.put(`${backendUrl}/api/users/${editingUser._id}`, editingUser);
+    toast.success('Edit User Successfully')
     setUsers(users.map(user => user._id === editingUser._id ? res.data : user));
     setIsEditing(false);
     setEditingUser(null);
@@ -89,6 +93,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const handleDeleteUser = async (id) => {
     if (window.confirm('Delete this user?')) {
       await axios.delete(`${backendUrl}/api/users/${id}`);
+    toast.success('Delete User Successfully')
       setUsers(users.filter(user => user._id !== id));
     }
   };

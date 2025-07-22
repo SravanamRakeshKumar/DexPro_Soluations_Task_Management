@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Search, Filter, FolderOpen, Edit2, Trash2 } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+// import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import ProjectCard from '../components/ProjectCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { projectService } from '../services/projectService'

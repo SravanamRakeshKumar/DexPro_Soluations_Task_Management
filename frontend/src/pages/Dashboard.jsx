@@ -1,4 +1,4 @@
-import React, { useEffect, useState ,useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import {
   Users, FolderOpen, CheckSquare, Clock, Activity,
@@ -9,21 +9,19 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Chart from 'chart.js/auto';
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth(); // ✅ use auth loading state
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({});
   const [issues, setIssues] = useState([]);
 
   const coordinatorTaskChartRef = useRef(null);
-const logReviewChartRef = useRef(null);
-
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-
+  const logReviewChartRef = useRef(null);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const role = user?.role?.toLowerCase();
 
+  // 1. Fetch Dashboard Data
   useEffect(() => {
-    if (!user || authLoading) return; // ✅ wait for user to load
+    if (!user || authLoading) return;
 
     const fetchDashboardData = async () => {
       try {
@@ -33,16 +31,6 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
         setStats(res.data);
         setLoading(false);
-
-        // Draw charts
-        if (role === 'admin') {
-          drawPieChart(res.data.roleDistribution);
-          drawBarChart(res.data.projectStatus, 'projectBar');
-        } else if (role === 'team lead') {
-          drawBarChart(res.data.taskProgress, 'teamProgress');
-        } else if (role === 'employee') {
-          drawBarChart(res.data.weeklyHours, 'employeeChart');
-        }
       } catch (err) {
         console.error('Failed to load dashboard:', err);
         setLoading(false);
@@ -50,52 +38,63 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
     };
 
     fetchDashboardData();
-  }, [user, authLoading, role]);
+  }, [user, authLoading]);
 
-useEffect(() => {
-  // 1. Destroy old chart if exists
-  if (coordinatorTaskChartRef.current) {
-    coordinatorTaskChartRef.current.destroy();
-  }
+  // 2. Draw charts after DOM is mounted
+  useEffect(() => {
+    if (!stats || !role) return;
 
-  if (logReviewChartRef.current) {
-    logReviewChartRef.current.destroy();
-  }
+    const drawCharts = () => {
+      if (role === 'admin') {
+        drawPieChart(stats.roleDistribution);
+        drawBarChart(stats.projectStatus, 'projectBar');
+      } else if (role === 'team lead') {
+        drawBarChart(stats.taskProgress, 'teamProgress');
+      } else if (role === 'employee') {
+        drawBarChart(stats.weeklyHours, 'employeeChart');
+      } else if (role === 'coordinator') {
+        // Destroy previous charts if exist
+        if (coordinatorTaskChartRef.current) coordinatorTaskChartRef.current.destroy();
+        if (logReviewChartRef.current) logReviewChartRef.current.destroy();
 
-  const ctx1 = document.getElementById('coordinatorTaskChart');
-  const ctx2 = document.getElementById('logReviewChart');
+        const ctx1 = document.getElementById('coordinatorTaskChart');
+        const ctx2 = document.getElementById('logReviewChart');
 
-  // 2. Create new charts and store instance in ref
-  if (ctx1) {
-    coordinatorTaskChartRef.current = new Chart(ctx1, {
-      type: 'doughnut',
-      data: {
-        labels: ['In Progress', 'Pending', 'Completed'],
-        datasets: [{
-          data: [stats.tasksInProgress, stats.tasksPending, stats.tasksCompleted],
-          backgroundColor: ['#6366F1', '#FBBF24', '#10B981'],
-        }],
-      },
-    });
-  }
+        if (ctx1) {
+          coordinatorTaskChartRef.current = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+              labels: ['In Progress', 'Pending', 'Completed'],
+              datasets: [{
+                data: [stats.tasksInProgress, stats.tasksPending, stats.tasksCompleted],
+                backgroundColor: ['#6366F1', '#FBBF24', '#10B981'],
+              }],
+            },
+          });
+        }
 
-  if (ctx2) {
-    logReviewChartRef.current = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: stats.reviewedDates || [],
-        datasets: [{
-          label: 'Logs Reviewed',
-          data: stats.logsReviewedPerDay || [],
-          backgroundColor: '#3B82F6',
-        }],
-      },
-    });
-  }
-}, [stats]);
+        if (ctx2) {
+          logReviewChartRef.current = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+              labels: stats.reviewedDates || [],
+              datasets: [{
+                label: 'Logs Reviewed',
+                data: stats.logsReviewedPerDay || [],
+                backgroundColor: '#3B82F6',
+              }],
+            },
+          });
+        }
+      }
+    };
 
+    // Delay ensures DOM canvases are available
+    const delay = setTimeout(drawCharts, 150);
+    return () => clearTimeout(delay);
+  }, [stats, role]);
 
-
+  // Chart helper functions
   const drawPieChart = (data) => {
     const canvas = document.getElementById('adminPie');
     if (!canvas) return;
@@ -131,6 +130,16 @@ useEffect(() => {
       }
     });
   };
+
+  // Render loading
+  if (loading || authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner size="xl" />
+      </div>
+    );
+  }
+
 
   const cardData = {
     admin: [
@@ -236,20 +245,47 @@ useEffect(() => {
 
   return (
     <div className="space-y-6 fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user?.name}!</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Here's your overview as <strong>{role}</strong>.</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            })}
-          </span>
-        </div>
-      </div>
+
+ <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 space-y-3 md:space-y-0">
+  {/* Left side: Welcome + Role (mobile: stacked, desktop: vertical) */}
+  <div className="md:text-left">
+    {/* Welcome Message (always full width) */}
+    <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+      Welcome back, {user?.name}!
+    </h1>
+
+    {/* Mobile view: Role + Date in one row below */}
+    <div className="flex justify-between md:hidden gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+      <p>Here's your overview as: <strong>{role}</strong></p>
+      {/* <span>•</span> */}
+      <span>
+        {new Date().toLocaleDateString('en-US', {
+        weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'
+      })}
+        {/* {new Date().toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric'
+        })} */}
+      </span>
+    </div>
+
+    {/* Desktop view: Role only (date shown separately on right) */}
+    <p className="hidden md:block text-sm text-gray-600 dark:text-gray-400 mt-1">
+      Here's your overview as <strong>{role}</strong>.
+    </p>
+  </div>
+
+  {/* Desktop-only: Date on the right */}
+  <div className="hidden md:flex items-center space-x-2">
+    <Calendar className="h-5 w-5 text-gray-500" />
+    <span className="text-sm text-gray-600 dark:text-gray-400">
+      {new Date().toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      })}
+    </span>
+  </div>
+</div>
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {cardData[role]?.map((card, i) => (

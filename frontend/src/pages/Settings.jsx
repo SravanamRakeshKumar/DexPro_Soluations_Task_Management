@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import settingsService from '../services/settingsService';
+// import { toast } from 'react-toastify';
 import { toast } from 'react-toastify';
+
 
 const Settings = () => {
   const [user, setUser] = useState(null);

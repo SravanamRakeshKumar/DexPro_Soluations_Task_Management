@@ -15,9 +15,16 @@ router.get('/', authenticateToken, async (req, res) => {
     if (status) filter.status = status
     if (createdBy) filter.createdBy = createdBy
 
-    if (req.user.role === 'Employee') {
-  filter.teamMembers = req.user._id
+//     if (req.user.role === 'Employee') {
+//   filter.teamMembers = req.user._id
+// }
+
+if (req.user.role === 'Employee') {
+  filter.teamMembers = req.user._id;
+} else if (req.user.role === 'Team Lead') {
+  filter.createdBy = req.user._id; // 👈 Only fetch team lead's own projects
 }
+
 
 
     const projects = await Project.find(filter)

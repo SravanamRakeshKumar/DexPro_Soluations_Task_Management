@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { CheckSquare, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { toast } from 'react-hot-toast'
+// import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/LoadingSpinner'
 
 const Login = () => {

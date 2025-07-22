@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { taskService } from '../services/taskService'
 import { projectService } from '../services/projectService'
 import { useAuth } from '../contexts/AuthContext'
-import { toast } from 'react-hot-toast'
+// import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import {
   ClipboardCheck, UserCircle, Calendar, CheckCircle, Users, Briefcase
 } from 'lucide-react'

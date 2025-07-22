@@ -108,7 +108,7 @@ const Header = () => {
 
       {/* Mobile dropdown menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden mt-3 space-y-1">
+        <div className="absolute md:hidden -ml-5 mt-3 space-y-1 w-full bg-gray-50 dark:bg-gray-900">
          {/* <div className="inset-0 z-40 md:hidden mt-3 bg-white dark:bg-gray-900 shadow-lg overflow-auto"> */}
           {filteredMenu.map((item) => (
             <NavLink

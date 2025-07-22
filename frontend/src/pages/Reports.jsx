@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Download, Filter, Calendar, BarChart3, Users, Activity } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+// import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/LoadingSpinner'
 import { reportService } from '../services/reportService'
 
