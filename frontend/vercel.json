@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://backend-management-gules.vercel.app/api/$1"
+    }
+  ]
+}
